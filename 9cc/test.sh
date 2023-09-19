@@ -18,6 +18,7 @@ try(){
 
 try 0 0
 try 42 42
-
+try 45 '42+7-4'
+try 10 '1+1+1+7'
 
 echo OK
