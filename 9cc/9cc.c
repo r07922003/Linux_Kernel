@@ -1,9 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
+
+void error(char *fmt, ...){
+    va_list ap;
+    va_start(ap, fmt);
+    vfprintf(stderr, fmt, ap);
+    fprintf(stderr, "\n");
+    exit(1);
+}
 
 int main(int argc,char **argv){
     if(argc != 2){
-        fprintf(stderr,"The numbers of arguments are wrong.\n");
+        //fprintf(stderr,"The numbers of arguments are wrong.\n");
+        error("The numbers of arguments are wrong");
         return  1;
     }
     char *p = argv[1];
@@ -26,7 +36,8 @@ int main(int argc,char **argv){
             printf("  sub rax, %ld\n",strtol(p,&p,10));
             continue;
         }
-        fprintf(stderr,"Unexpected word: '%c'\n",*p);
+        //fprintf(stderr,"Unexpected word: '%c'\n",*p);
+        error("Unexpected word: '%c'",*p);
         return 1;
     }
 
