@@ -8,3 +8,5 @@ Translator: 高至賢（Jason Kao）
 Title of the Original Book: [低レイヤを知りたい人のためのCコンパイラ作成入門](https://www.sigbus.info/compilerbook)
 
 Original Author: Rui Ueyama <ruiu@cs.stanford.edu>
+
+Original Github: https://github.com/rui314/chibicc
