@@ -1,6 +1,16 @@
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <stdbool.h>
+
+typedef enum{
+    TK_RESERVED, //symbol
+    TK_NUM,      //number
+    TK_EOF,      //end symbol
+} TokenKind;
+
+typedef struct Token Token;
 
 void error(char *fmt, ...){
     va_list ap;
@@ -10,35 +20,90 @@ void error(char *fmt, ...){
     exit(1);
 }
 
+struct Token{
+    TokenKind kind;
+    Token *next;
+    int val;
+    char *str;
+};
+
+Token *token;
+
+Token *__new_token(TokenKind tokenKind, Token *cur, char *str){
+    Token *token = calloc(1,sizeof(Token));
+    token->kind = tokenKind;
+    token->str = str;
+    cur->next = token;
+    return token;
+}
+Token *__tokenize(char *p){
+    Token head;
+    head.next = NULL;
+    Token *cur = &head;
+
+    while(*p){
+        if(isspace(*p)){
+            p++;
+            continue;;
+        }
+        if(*p=='+' || *p=='-'){
+            cur = __new_token(TK_RESERVED, cur, p++);
+            continue;
+        }
+        if(isdigit(*p)){
+            cur = __new_token(TK_NUM, cur, p);
+            cur->val = strtol(p, &p, 10);
+            continue;
+        }
+        error("tokenize failed.");
+    }
+    __new_token(TK_EOF, cur, p);
+    return head.next;
+}
+
+void expect(char op){
+    if(token->kind != TK_RESERVED || token->str[0] != op) error("not is %c",op);
+    token = token->next;
+}
+
+int expect_number(){
+    if(token->kind != TK_NUM) error("Not a number");
+    int val = token->val;
+    token = token->next;
+    return val;
+}
+
+bool at_eof(){
+    return token->kind == TK_EOF;
+}
+
+bool consume(char op){
+    if(token->kind != TK_RESERVED || token->str[0] != op) return false;
+    token = token->next;
+    return true;
+}
+
+
 int main(int argc,char **argv){
     if(argc != 2){
-        //fprintf(stderr,"The numbers of arguments are wrong.\n");
         error("The numbers of arguments are wrong");
         return  1;
     }
-    char *p = argv[1];
+    token = __tokenize(argv[1]);
 
     printf(".intel_syntax noprefix\n");
     printf(".global main\n");
     printf("main:\n");
-    printf("  mov rax, %ld\n",strtol(p,&p,10));
+    printf("  mov rax, %d\n",expect_number());
 
-    while (*p){
-        if(*p=='+')
+    while(!at_eof(token)){
+        if(consume('+'))
         {
-            p++;
-            printf("  add rax, %ld\n",strtol(p,&p,10));
+            printf("  add rax, %d\n",expect_number());
             continue;
         }
-        if(*p=='-')
-        {
-            p++;
-            printf("  sub rax, %ld\n",strtol(p,&p,10));
-            continue;
-        }
-        //fprintf(stderr,"Unexpected word: '%c'\n",*p);
-        error("Unexpected word: '%c'",*p);
-        return 1;
+        expect('-');
+        printf("  sub rax, %d\n",expect_number());
     }
 
     printf("  ret\n");
