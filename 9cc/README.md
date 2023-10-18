@@ -21,10 +21,10 @@ What skills i learned:
       Using **'*'** is a nice way to put some spaces in your file, avoiding a loop.
 2. Generate syntax tree by EBNF (Extended Backus–Naur form)
     -  expr = equality
-    -  equality = relational ($"=="$ relational $|$ $"!="$ relational) $*$
-    -  relational = add ($"<"$ add $|$ $"<="$ add $|$ $">"$ add $|$ $">="$ add) $*$
-    - add = mul ($"+"$ mul $|$ $"-"$ mul) $*$
-    - mul = unary ($"*"$ unary $|$ $"/"$ unary) $*$
-    - unary = ($"+"$  $|$ $"-"$) $?$ term
-    - term = num | $($ expr $)$
+    -  equality = relational ("==" relational | "!=" relational) $*$
+    -  relational = add ("<" add | "<=" add | ">" add | ">=" add) $*$
+    - add = mul ("+" mul | "-" mul) *
+    - mul = unary ("*" unary | "/" unary) $*$
+    - unary = ("+"  | "-") $?$ term
+    - term = num | ( expr )
 3. Using x86-64 push and pop instructions to simulate the stack due to implementation via recursion.
