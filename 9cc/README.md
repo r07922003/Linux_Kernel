@@ -23,8 +23,8 @@ What skills i learned:
     -  expr = equality
     -  equality = relational ("==" relational | "!=" relational) $*$
     -  relational = add ("<" add | "<=" add | ">" add | ">=" add) $*$
-    - add = mul ("+" mul | "-" mul) *
-    - mul = unary ("*" unary | "/" unary) $*$
+    - add = mul ("+" mul | "-" mul) $*$
+    - mul = unary (* unary | "/" unary) $*$
     - unary = ("+"  | "-") $?$ term
     - term = num | ( expr )
 3. Using x86-64 push and pop instructions to simulate the stack due to implementation via recursion.
