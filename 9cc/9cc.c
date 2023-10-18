@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdbool.h>
+#include <string.h>
 
 typedef enum{
     TK_RESERVED, //symbol
@@ -45,6 +46,7 @@ Node *new_node_num(int val){
 
 Node *expr();
 Node *mul();
+Node *unary();
 Node *term();
 
 Token *token;
@@ -135,7 +137,8 @@ bool consume(char op){
 
 /*
  expr = mul ('+' mul | '-' mul) *
- mul = term ('*' term | '/' term) *
+ mul = unary ('*' unary | '/' unary) *
+ unary = ("+" unary | "-" unary)? term
  term = num | '(' expr ')'
 */
 
@@ -149,12 +152,17 @@ Node *expr(){
 }
 
 Node *mul(){
-    Node *node = term();
+    Node *node = unary();
     for(;;){
-        if(consume('*')) node = new_node(ND_MUL, node, term());
-        else if(consume('/')) node = new_node(ND_DIV, node, term());
+        if(consume('*')) node = new_node(ND_MUL, node, unary());
+        else if(consume('/')) node = new_node(ND_DIV, node, unary());
         else return node;
     }
+}
+Node *unary(){
+    if(consume('+')) return unary();
+    if(consume('-')) return new_node(ND_SUB,new_node_num(0),unary());
+    return term();
 }
 
 Node *term(){
