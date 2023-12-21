@@ -1,6 +1,7 @@
 # NetWork Socket about linux using by c
 
-Prerequisite knowledge for more detail of network: [link](https://hackmd.io/@nealson840123/network)
+Prerequisite knowledge:
+1. More detail of network: [link](https://hackmd.io/@nealson840123/network)
 
 complie the server.c and client.c
 ```
