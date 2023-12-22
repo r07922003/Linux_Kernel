@@ -24,3 +24,7 @@ Testing Demo Vedio: [link](https://youtu.be/f8sakRxpbc8)
 
 Futrue Work:
 - [Handling out-of-band and in-band date with select and handle multiple clients by select without fork.](https://www.topcoder.com/thrive/articles/Linux%20Programming%20-%20Dive%20Into%20the%20Select%20Model)
+- Event-driven Server e.g. **NGINX**
+    - Design:
+        ![design](https://www.nginx.com/wp-content/uploads/2015/06/infographic-Inside-NGINX_process-model.png)
+    - worker 的 main loop 可參考  [ngx_epoll_module.c](https://github.com/nginx/nginx/blob/a64190933e06758d50eea926e6a55974645096fd/src/event/modules/ngx_epoll_module.c) 中的 ngx_epoll_process_events
