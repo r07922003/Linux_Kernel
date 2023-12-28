@@ -57,7 +57,7 @@ Node *stmt(Token **token){
         expect(token,";");
         return cur;
     }
-    Node *cur = expr(token);
+    Node *cur = new_node_unary(ND_EXPR_STMT, expr(token));
     expect(token,";");
     return cur;
 }
@@ -123,6 +123,10 @@ void gen(Node *node){
     switch(node->kind){
         case ND_NUM:
             printf("  push %d\n",node->val);
+            return;
+        case ND_EXPR_STMT:
+            gen(node->l);
+            printf("  add rsp, 8\n");
             return;
         case ND_RETURN:
             gen(node->l);

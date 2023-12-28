@@ -18,7 +18,6 @@ int main(int argc,char **argv){
 
     for(Node *cur=cur_node;cur;cur = cur->next){
         gen(cur);
-        printf("  pop rax\n");
     }
 
     printf("  ret\n");
