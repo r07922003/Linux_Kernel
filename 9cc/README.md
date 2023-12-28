@@ -11,6 +11,8 @@ Original Author: Rui Ueyama <ruiu@cs.stanford.edu>
 
 Original Github: https://github.com/rui314/chibicc
 
+[Commit](https://github.com/rui314/chibicc/commits/reference?after=ce61154cf542e630bc3e40262fdacdf20bf91b90+69);
+
 ---
 What skills i learned:
 
