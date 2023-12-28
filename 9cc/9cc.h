@@ -31,6 +31,8 @@ void error(char *fmt, ...);
 void error_at(char *loc,char *fmt, ...);
 void expect(Token** token,char *op);
 int expect_number(Token **token);
+bool is_alpha(char);
+bool is_alnum(char);
 bool consume(Token **token,char *op);
 bool startswith(char *a, char *b);
 bool at_eof(Token *token);
@@ -43,15 +45,16 @@ Token *__tokenize(char *p);
 
 // AST node
 typedef enum{
-    ND_ADD, // +
-    ND_SUB, // -
-    ND_MUL, // *
-    ND_DIV, // /
-    ND_EQ,  // ==
-    ND_NE,  // !=
-    ND_LT,  // <
-    ND_LE,  // <=
-    ND_NUM, // Integer
+    ND_ADD,    // +
+    ND_SUB,    // -
+    ND_MUL,    // *
+    ND_DIV,    // /
+    ND_EQ,     // ==
+    ND_NE,     // !=
+    ND_LT,     // <
+    ND_LE,     // <=
+    ND_RETURN, // "return"
+    ND_NUM,    // Integer
 } NodeKind;
 
 //AST node type
@@ -64,7 +67,9 @@ struct Node{
     int val;
 };
 
-Node *new_node(NodeKind kind,Node *l,Node *r);
+Node *new_node(NodeKind kind);
+Node *new_node_binary(NodeKind kind,Node *l,Node *r);
+Node *new_node_unary(NodeKind kind,Node *expr);
 Node *program(Token **);
 Node *stmt(Token **);
 Node *expr(Token**);

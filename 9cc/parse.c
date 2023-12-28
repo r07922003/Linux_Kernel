@@ -1,10 +1,22 @@
 #include "9cc.h"
 
-Node *new_node(NodeKind kind,Node *l,Node *r){
+Node *new_node(NodeKind kind){
+    Node *cur = calloc(1, sizeof(Node));
+    cur->kind = kind;
+    return cur;
+}
+
+Node *new_node_binary(NodeKind kind,Node *l,Node *r){
     Node *cur = calloc(1, sizeof(Node));
     cur->kind = kind;
     cur->l = l;
     cur->r = r;
+    return cur;
+}
+
+Node *new_node_unary(NodeKind kind,Node *expr){
+    Node *cur = new_node(kind);
+    cur->l = expr;
     return cur;
 }
 
@@ -18,7 +30,7 @@ Node *new_node_num(int val){
 
 /*
  program = stmt*
- stmt = expr ";"
+ stmt = (return)* expr ";"
  expr = equality
  equality = relational ("==" relational | "!=" relational)*
  relational = add ("<" add | "<=" add | ">" add | ">=" add)*
@@ -40,6 +52,11 @@ Node *program(Token ** token){
 }
 
 Node *stmt(Token **token){
+    if(consume(token,"return")){
+        Node *cur = new_node_unary(ND_RETURN, expr(token));
+        expect(token,";");
+        return cur;
+    }
     Node *cur = expr(token);
     expect(token,";");
     return cur;
@@ -52,8 +69,8 @@ Node *expr(Token** token){
 Node *equality(Token** token){
     Node *cur = relational(token);
     for(;;){
-        if(consume(token,"==")) cur = new_node(ND_EQ, cur, relational(token));
-        else if(consume(token,"!=")) cur = new_node(ND_NE, cur, relational(token));
+        if(consume(token,"==")) cur = new_node_binary(ND_EQ, cur, relational(token));
+        else if(consume(token,"!=")) cur = new_node_binary(ND_NE, cur, relational(token));
         else return cur;
     }
 }
@@ -61,10 +78,10 @@ Node *equality(Token** token){
 Node *relational(Token** token){
     Node *cur = add(token);
     for(;;){
-        if(consume(token,"<")) cur = new_node(ND_LT, cur, add(token));
-        else if(consume(token,"<=")) cur = new_node(ND_LE, cur, add(token));
-        else if(consume(token,">")) cur = new_node(ND_LT, add(token), cur);
-        else if(consume(token,">=")) cur = new_node(ND_LE, add(token), cur);
+        if(consume(token,"<")) cur = new_node_binary(ND_LT, cur, add(token));
+        else if(consume(token,"<=")) cur = new_node_binary(ND_LE, cur, add(token));
+        else if(consume(token,">")) cur = new_node_binary(ND_LT, add(token), cur);
+        else if(consume(token,">=")) cur = new_node_binary(ND_LE, add(token), cur);
         else return cur;
     }
 }
@@ -72,8 +89,8 @@ Node *relational(Token** token){
 Node *add(Token** token){
     Node *cur = mul(token);
     for(;;){
-        if(consume(token,"+")) cur = new_node(ND_ADD, cur, mul(token));
-        else if(consume(token,"-")) cur = new_node(ND_SUB, cur, mul(token));
+        if(consume(token,"+")) cur = new_node_binary(ND_ADD, cur, mul(token));
+        else if(consume(token,"-")) cur = new_node_binary(ND_SUB, cur, mul(token));
         else return cur;
     }
 }
@@ -81,15 +98,15 @@ Node *add(Token** token){
 Node *mul(Token** token){
     Node *node = unary(token);
     for(;;){
-        if(consume(token,"*")) node = new_node(ND_MUL, node, unary(token));
-        else if(consume(token,"/")) node = new_node(ND_DIV, node, unary(token));
+        if(consume(token,"*")) node = new_node_binary(ND_MUL, node, unary(token));
+        else if(consume(token,"/")) node = new_node_binary(ND_DIV, node, unary(token));
         else return node;
     }
 }
 
 Node *unary(Token** token){
     if(consume(token,"+")) return unary(token);
-    if(consume(token,"-")) return new_node(ND_SUB,new_node_num(0),unary(token));
+    if(consume(token,"-")) return new_node_binary(ND_SUB,new_node_num(0),unary(token));
     return term(token);
 }
 
@@ -103,9 +120,15 @@ Node *term(Token** token){
 }
 
 void gen(Node *node){
-    if(node->kind == ND_NUM){
-        printf("  push %d\n",node->val);
-        return;
+    switch(node->kind){
+        case ND_NUM:
+            printf("  push %d\n",node->val);
+            return;
+        case ND_RETURN:
+            gen(node->l);
+            printf("  pop rax\n");
+            printf("  ret\n");
+            return;
     }
 
     gen(node->l);
