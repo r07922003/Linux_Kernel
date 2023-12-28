@@ -17,6 +17,8 @@ Node *new_node_num(int val){
 
 
 /*
+ program = stmt*
+ stmt = expr ";"
  expr = equality
  equality = relational ("==" relational | "!=" relational)*
  relational = add ("<" add | "<=" add | ">" add | ">=" add)*
@@ -25,6 +27,23 @@ Node *new_node_num(int val){
  unary = ("+" unary | "-" unary)? term
  term = num | '(' expr ')'
 */
+Node *program(Token ** token){
+    Node head;
+    head.next = NULL;
+    Node *cur = &head;
+
+    while(!at_eof(*token)){
+        cur->next = stmt(token);
+        cur = cur->next;
+    }
+    return head.next;
+}
+
+Node *stmt(Token **token){
+    Node *cur = expr(token);
+    expect(token,";");
+    return cur;
+}
 
 Node *expr(Token** token){
     return equality(token);

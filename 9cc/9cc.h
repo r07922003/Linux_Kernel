@@ -33,6 +33,7 @@ void expect(Token** token,char *op);
 int expect_number(Token **token);
 bool consume(Token **token,char *op);
 bool startswith(char *a, char *b);
+bool at_eof(Token *token);
 Token *__new_token(TokenKind tokenKind, Token *cur, char *str,int len);
 Token *__tokenize(char *p);
 
@@ -57,12 +58,15 @@ typedef enum{
 typedef struct Node Node;
 struct Node{
     NodeKind kind; // kind of node
+    Node *next;
     Node *l;
     Node *r;
     int val;
 };
 
 Node *new_node(NodeKind kind,Node *l,Node *r);
+Node *program(Token **);
+Node *stmt(Token **);
 Node *expr(Token**);
 Node *equality(Token**);
 Node *relational(Token**);

@@ -43,6 +43,10 @@ bool startswith(char *a, char *b){
     return memcmp(a,b,strlen(b)) == 0;
 }
 
+bool at_eof(Token *token){
+    return token->kind == TK_EOF;
+}
+
 Token *__new_token(TokenKind tokenKind, Token *cur, char *str,int len){
     Token *token = calloc(1,sizeof(Token));
     token->kind = tokenKind;
@@ -67,7 +71,7 @@ Token *__tokenize(char *p){
             p+=2;
             continue;
         }
-        if(strchr("+-*/()<>", *p)){
+        if(strchr("+-*/()<>;", *p)){
             cur = __new_token(TK_RESERVED, cur, p++,1);
             continue;
         }

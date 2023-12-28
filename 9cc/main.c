@@ -10,15 +10,17 @@ int main(int argc,char **argv){
 
     user_input = argv[1];
     Token *token = __tokenize(user_input);
-    Node *cur_node = expr(&token);
+    Node *cur_node = program(&token);
 
     printf(".intel_syntax noprefix\n");
     printf(".global main\n");
     printf("main:\n");
 
-    gen(cur_node);
+    for(Node *cur=cur_node;cur;cur = cur->next){
+        gen(cur);
+        printf("  pop rax\n");
+    }
 
-    printf("  pop rax\n");
     printf("  ret\n");
     return 0;
 }
