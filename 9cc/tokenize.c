@@ -47,6 +47,13 @@ bool consume(Token **token,char *op){
     return true;
 }
 
+Token *consume_ident(Token **token){
+    if((*token)->kind != TK_IDENT) return NULL;
+    Token *res = *token;
+    *token = (*token)->next;
+    return res;
+}
+
 bool startswith(char *a, char *b){
     return memcmp(a,b,strlen(b)) == 0;
 }
@@ -84,8 +91,12 @@ Token *__tokenize(char *p){
             p+=2;
             continue;
         }
-        if(strchr("+-*/()<>;", *p)){
+        if(strchr("+-*/()<>;=", *p)){
             cur = __new_token(TK_RESERVED, cur, p++,1);
+            continue;
+        }
+        if('a'<=*p && *p<='z'){
+            cur = __new_token(TK_IDENT, cur, p++, 1);
             continue;
         }
         if(isdigit(*p)){

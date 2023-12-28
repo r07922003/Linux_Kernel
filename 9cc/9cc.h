@@ -13,6 +13,7 @@
 // Token
 typedef enum{
     TK_RESERVED, //symbol
+    TK_IDENT,    //identifiers
     TK_NUM,      //number
     TK_EOF,      //end symbol
 } TokenKind;
@@ -34,6 +35,7 @@ int expect_number(Token **token);
 bool is_alpha(char);
 bool is_alnum(char);
 bool consume(Token **token,char *op);
+Token *consume_ident(Token **);
 bool startswith(char *a, char *b);
 bool at_eof(Token *token);
 Token *__new_token(TokenKind tokenKind, Token *cur, char *str,int len);
@@ -53,8 +55,10 @@ typedef enum{
     ND_NE,        // !=
     ND_LT,        // <
     ND_LE,        // <=
+    ND_ASSIGN,    // =
     ND_RETURN,    // "return"
     ND_EXPR_STMT, // Expression statement
+    ND_LVAR,      // Local variable
     ND_NUM,       // Integer
 } NodeKind;
 
@@ -66,20 +70,28 @@ struct Node{
     Node *l;
     Node *r;
     int val;
+    char name;     // used if kind == ND_LVAR
 };
 
 Node *new_node(NodeKind kind);
 Node *new_node_binary(NodeKind kind,Node *l,Node *r);
 Node *new_node_unary(NodeKind kind,Node *expr);
+Node *new_node_lvar(char);
 Node *program(Token **);
 Node *stmt(Token **);
 Node *expr(Token**);
+Node *assign(Token **);
 Node *equality(Token**);
 Node *relational(Token**);
 Node *add(Token**);
 Node *mul(Token**);
 Node *unary(Token**);
-Node *term(Token**);
+Node *primary(Token**);
+
+//
+// codegen.c
+//
+
 void gen(Node *node);
 
 //
