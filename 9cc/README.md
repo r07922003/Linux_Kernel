@@ -22,11 +22,14 @@ What skills i learned:
       ```"_,_,_,_,hellow"```
       Using **'*'** is a nice way to put some spaces in your file, avoiding a loop.
 2. Generate syntax tree by EBNF (Extended Backus–Naur form)
-    - expr = equality
+    - program = stmt*
+    - stmt = retrun expr ";" | expr ";"
+    - expr = assign
+    - assign = equality ("=" assign)$?$
     - equality = relational ("==" relational | "!=" relational) $*$
     - relational = add ("<" add | "<=" add | ">" add | ">=" add) $*$
     - add = mul ("+" mul | "-" mul) $*$
     - mul = unary (* unary | "/" unary) $*$
-    - unary = ("+"  | "-") $?$ term
-    - term = num | ( expr )
+    - unary = ("+" unary  | "-" unary) $?$ primary
+    - primary = "(" expr ")" | ident | num
 3. Using x86-64 push and pop instructions to simulate the stack due to implementation via recursion.
