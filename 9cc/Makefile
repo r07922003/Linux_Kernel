@@ -11,7 +11,13 @@ $(OBJS): 9cc.h
 test: 9cc
 		./test.sh
 
+doc:
+	@doxygen
+
 clean:
 	rm -f 9cc *.o *~ temp*
 
-.PHONY: test clean
+distclean:
+	rm -rf doc
+
+.PHONY: all
