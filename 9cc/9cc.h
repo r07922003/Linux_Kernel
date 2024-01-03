@@ -32,6 +32,7 @@ void error(char *fmt, ...);
 void error_at(char *loc,char *fmt, ...);
 void expect(Token** token,char *op);
 int expect_number(Token **token);
+char *strndup(char *p, int len);
 bool is_alpha(char);
 bool is_alnum(char);
 bool consume(Token **token,char *op);
@@ -44,6 +45,14 @@ Token *__tokenize(char *p);
 //
 // parse.c
 //
+
+// Local variable
+typedef struct Var Var;
+struct Var{
+    Var *next;
+    char *name; // Variable name
+    int offset; // Offset from RMP (instruction set command for stack)
+};
 
 // AST node
 typedef enum{
@@ -58,7 +67,7 @@ typedef enum{
     ND_ASSIGN,    // =
     ND_RETURN,    // "return"
     ND_EXPR_STMT, // Expression statement
-    ND_LVAR,      // Local variable
+    ND_VAR,       // Variable
     ND_NUM,       // Integer
 } NodeKind;
 
@@ -70,16 +79,25 @@ struct Node{
     Node *l;
     Node *r;
     int val;
-    char name;     // used if kind == ND_LVAR
+    Var *var;      // Used if kind == ND_VAR
 };
+
+typedef struct{
+    Node *node;
+    Var *locals;
+    int stack_size;
+} Program;
 
 Node *new_node(NodeKind kind);
 Node *new_node_binary(NodeKind kind,Node *l,Node *r);
 Node *new_node_unary(NodeKind kind,Node *expr);
-Node *new_node_lvar(char);
-Node *program(Token **);
+Node *new_node_var(Var *);
+Var *push_var(char *);
+Var *find_var(Token *);
+
+Program *program(Token **);
 Node *stmt(Token **);
-Node *expr(Token**);
+Node *expr(Token **);
 Node *assign(Token **);
 Node *equality(Token**);
 Node *relational(Token**);

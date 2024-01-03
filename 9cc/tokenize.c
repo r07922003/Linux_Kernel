@@ -33,6 +33,13 @@ int expect_number(Token **token){
     return val;
 }
 
+char *strndup(char *p, int len){
+    char *buf = malloc(len+1);
+    strncpy(buf,p,len);
+    buf[len] = '\0';
+    return buf;
+}
+
 bool is_alpha(char c){
     return ('a'<=c && c<='z') || ('A'<=c && c<='Z') || c=='_';
 }
@@ -95,8 +102,10 @@ Token *__tokenize(char *p){
             cur = __new_token(TK_RESERVED, cur, p++,1);
             continue;
         }
-        if('a'<=*p && *p<='z'){
-            cur = __new_token(TK_IDENT, cur, p++, 1);
+        if(is_alpha(*p)){
+            char *q = p++;
+            while(is_alnum(*p)) p++;
+            cur = __new_token(TK_IDENT, cur, q,p-q);
             continue;
         }
         if(isdigit(*p)){

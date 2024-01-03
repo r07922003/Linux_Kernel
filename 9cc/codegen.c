@@ -1,9 +1,8 @@
 #include "9cc.h"
 
 void gen_addr(Node *node){
-  if (node->kind == ND_LVAR) {
-    int offset = ((node->name - 'a' + 1)<<3);
-    printf("  lea rax, [rbp-%d]\n", offset);
+  if (node->kind == ND_VAR) {
+    printf("  lea rax, [rbp-%d]\n", node->var->offset);
     printf("  push rax\n");
     return;
   }
@@ -33,7 +32,7 @@ void gen(Node *node){
             gen(node->l);
             printf("  add rsp, 8\n");
             return;
-        case ND_LVAR:
+        case ND_VAR:
             gen_addr(node);
             load();
             return;

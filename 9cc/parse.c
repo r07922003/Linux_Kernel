@@ -1,5 +1,17 @@
 #include "9cc.h"
 
+Var *locals;
+
+// O(n) sequential way to find the duplicate local variable
+Var *find_var(Token *token){
+    for(Var *cur_var = locals; cur_var; cur_var=cur_var->next){
+        if(strlen(cur_var->name)==token->len && !memcmp(token->str,cur_var->name,token->len)){
+            return cur_var;
+        }
+    }
+    return NULL;
+}
+
 Node *new_node(NodeKind kind){
     Node *cur = calloc(1, sizeof(Node));
     cur->kind = kind;
@@ -27,12 +39,19 @@ Node *new_node_num(int val){
     return cur;
 }
 
-Node *new_node_lvar(char name){
-    Node *cur = new_node(ND_LVAR);
-    cur->name = name;
+Node *new_node_var(Var *cur_var){
+    Node *cur = new_node(ND_VAR);
+    cur->var = cur_var;
     return cur;
 }
 
+Var *push_var(char *name){
+    Var *cur_var =  calloc(1,sizeof(Var));
+    cur_var->next = locals;
+    cur_var->name = name;
+    locals = cur_var;
+    return cur_var;
+}
 
 /*
  program = stmt*
@@ -46,7 +65,9 @@ Node *new_node_lvar(char name){
  unary = ("+" unary | "-" unary)? primary
  primary = "(" expr ")" | ident | num
 */
-Node *program(Token ** token){
+Program *program(Token ** token){
+    locals = NULL;
+
     Node head;
     head.next = NULL;
     Node *cur = &head;
@@ -55,7 +76,11 @@ Node *program(Token ** token){
         cur->next = stmt(token);
         cur = cur->next;
     }
-    return head.next;
+
+    Program *cur_prog = calloc(1,sizeof(Program));
+    cur_prog->node = head.next;
+    cur_prog->locals = locals;
+    return cur_prog;
 }
 
 Node *stmt(Token **token){
@@ -131,7 +156,11 @@ Node *primary(Token** token){
     }
 
     Token *temp = consume_ident(token);
-    if(temp) return new_node_lvar(*temp->str);
+    if(temp){
+        Var *cur_var = find_var(temp);
+        if(!cur_var) cur_var = push_var(strndup(temp->str,temp->len));
+        return new_node_var(cur_var);
+    }
 
     return new_node_num(expect_number(token));
 }

@@ -10,7 +10,15 @@ int main(int argc,char **argv){
 
     user_input = argv[1];
     Token *token = __tokenize(user_input);
-    Node *cur_node = program(&token);
+    Program *cur_prog = program(&token);
+
+    // Asign offsets to local variables
+    int offset = 0;
+    for(Var *cur_var = cur_prog->locals; cur_var; cur_var=cur_var->next){
+        offset += 8;
+        cur_var->offset = offset;
+    }
+    cur_prog->stack_size = offset;
 
     printf(".intel_syntax noprefix\n");
     printf(".global main\n");
@@ -19,9 +27,9 @@ int main(int argc,char **argv){
     // Prologue
     printf("  push rbp\n");
     printf("  mov rbp, rsp\n");
-    printf("  sub rsp, 208\n");
+    printf("  sub rsp, %d\n",cur_prog->stack_size);
 
-    for(Node *cur=cur_node;cur;cur = cur->next){
+    for(Node *cur=cur_prog->node;cur;cur = cur->next){
         gen(cur);
     }
 
