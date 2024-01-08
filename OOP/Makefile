@@ -9,6 +9,6 @@ Oop: $(OBJS)
 $(OBJS): encapsulation.h
 
 clean:
-	rm -f 9cc *.o *~ temp* Oop
+	rm -f Oop *.o *~ temp* 
 
 .PHONY: all
