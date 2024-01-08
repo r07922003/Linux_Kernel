@@ -6,7 +6,7 @@ OBJS=$(SRCS:.c=.o)
 Oop: $(OBJS)
 		$(CC) -o Oop $(OBJS) $(LDFLAGS)
 
-$(OBJS): encapsulation.h
+$(OBJS): *.h
 
 clean:
 	rm -f Oop *.o *~ temp* 
